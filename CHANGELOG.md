@@ -2,10 +2,6 @@
 
 ## UNRELEASED
 
-* [#1869](https://github.com/crypto-org-chain/cronos/pull/1869) Add missing tx context during vm initialisation
-* [#1872](https://github.com/crypto-org-chain/cronos/pull/1872) fix(evm): support 4byteTracer for tracer
-* [#1887](https://github.com/crypto-org-chain/cronos/pull/1887) fix: patch cometbft for GHSA-hrhf-2vcr-ghch
-
 *Sep 4, 2025*
 
 ## v1.5.0
@@ -29,9 +25,29 @@
 * [#1863](https://github.com/crypto-org-chain/cronos/pull/1863) Support EIP-7702 transaction type
 * [#1867](https://github.com/crypto-org-chain/cronos/pull/1867) Add authorizationList from `eth_getTransactionByHash` response for EIP-7702 transactions
 
-### Bug fixes
 
-* [#1858](https://github.com/crypto-org-chain/cronos/pull/1858) Fix version not found during pruning.
+## Bug fixes
+
+* [#1869](https://github.com/crypto-org-chain/cronos/pull/1869) Add missing tx context during vm initialisation
+* [#1872](https://github.com/crypto-org-chain/cronos/pull/1872) fix(evm): support 4byteTracer for tracer
+
+
+## v1.4.12
+
+* [#1850](https://github.com/crypto-org-chain/cronos/pull/1850) Optimize staking endblocker execution by caching queue entries from iterators.
+
+## v1.4.11
+
+* [#1884](https://github.com/crypto-org-chain/cronos/pull/1884) Patch comet bft (GHSA-hrhf-2vcr-ghch)
+
+## v1.4.10
+
+* [#1853](https://github.com/crypto-org-chain/cronos/pull/1853) Fix version not found during pruning.
+
+## v1.4.9
+
+* [#1830](https://github.com/crypto-org-chain/cronos/pull/1830) Add sanity check for rpc call Trace_Tx and Trace_call.
+
 
 *Jun 20, 2025*
 
