@@ -15,7 +15,7 @@ func NewCache(cacheSize int) cache.Cache {
 	if cacheSize == 0 {
 		return nil
 	}
-	return cache.New(cacheSize)
+	return newSafeCache(cache.New(cacheSize))
 }
 
 // Tree verify change sets by replay them to rebuild iavl tree and verify the root hashes

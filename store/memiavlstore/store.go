@@ -3,6 +3,7 @@ package memiavlstore
 import (
 	"fmt"
 	"io"
+	"sync/atomic"
 
 	cmtprotocrypto "github.com/cometbft/cometbft/proto/tendermint/crypto"
 	ics23 "github.com/cosmos/ics23/go"
@@ -27,18 +28,24 @@ var (
 
 // Store Implements types.KVStore and CommitKVStore.
 type Store struct {
-	tree   *memiavl.Tree
+	tree   atomic.Pointer[memiavl.Tree]
 	logger log.Logger
 
 	changeSet memiavl.ChangeSet
 }
 
 func New(tree *memiavl.Tree, logger log.Logger) *Store {
-	return &Store{tree: tree, logger: logger}
+	st := &Store{logger: logger}
+	st.tree.Store(tree)
+	return st
 }
 
 func (st *Store) SetTree(tree *memiavl.Tree) {
-	st.tree = tree
+	st.tree.Store(tree)
+}
+
+func (st *Store) getTree() *memiavl.Tree {
+	return st.tree.Load()
 }
 
 func (st *Store) Commit() types.CommitID {
@@ -46,9 +53,10 @@ func (st *Store) Commit() types.CommitID {
 }
 
 func (st *Store) LastCommitID() types.CommitID {
-	hash := st.tree.RootHash()
+	tree := st.getTree()
+	hash := tree.RootHash()
 	return types.CommitID{
-		Version: st.tree.Version(),
+		Version: tree.Version(),
 		Hash:    hash,
 	}
 }
@@ -89,12 +97,12 @@ func (st *Store) Set(key, value []byte) {
 
 // Get Implements types.KVStore.
 func (st *Store) Get(key []byte) []byte {
-	return st.tree.Get(key)
+	return st.getTree().Get(key)
 }
 
 // Has Implements types.KVStore.
 func (st *Store) Has(key []byte) bool {
-	return st.tree.Has(key)
+	return st.getTree().Has(key)
 }
 
 // Delete Implements types.KVStore.
@@ -106,11 +114,11 @@ func (st *Store) Delete(key []byte) {
 }
 
 func (st *Store) Iterator(start, end []byte) types.Iterator {
-	return st.tree.Iterator(start, end, true)
+	return st.getTree().Iterator(start, end, true)
 }
 
 func (st *Store) ReverseIterator(start, end []byte) types.Iterator {
-	return st.tree.Iterator(start, end, false)
+	return st.getTree().Iterator(start, end, false)
 }
 
 // SetInitialVersion sets the initial version of the IAVL tree. It is used when
@@ -132,25 +140,26 @@ func (st *Store) Query(req *types.RequestQuery) (res *types.ResponseQuery, err e
 		return nil, errors.Wrap(types.ErrTxDecode, "query cannot be zero length")
 	}
 
-	if req.Height > 0 && req.Height != st.tree.Version() {
+	tree := st.getTree()
+	if req.Height > 0 && req.Height != tree.Version() {
 		return nil, errors.Wrap(sdkerrors.ErrInvalidHeight, "invalid height")
 	}
 
 	res = &types.ResponseQuery{
-		Height: st.tree.Version(),
+		Height: tree.Version(),
 	}
 
 	switch req.Path {
 	case "/key": // get by key
 		res.Key = req.Data // data holds the key bytes
-		res.Value = st.tree.Get(res.Key)
+		res.Value = tree.Get(res.Key)
 
 		if !req.Prove {
 			break
 		}
 
 		// get proof from tree and convert to merkle.Proof before adding to result
-		res.ProofOps = getProofFromTree(st.tree, req.Data, res.Value != nil)
+		res.ProofOps = getProofFromTree(tree, req.Data, res.Value != nil)
 	case "/subspace":
 		pairs := memiavl.Pairs{
 			Pairs: make([]memiavl.Pair, 0),
@@ -182,7 +191,7 @@ func (st *Store) Query(req *types.RequestQuery) (res *types.ResponseQuery, err e
 }
 
 func (st *Store) WorkingHash() []byte {
-	return st.tree.RootHash()
+	return st.getTree().RootHash()
 }
 
 // Takes a MutableTree, a key, and a flag for creating existence or absence proof and returns the
