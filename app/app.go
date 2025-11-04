@@ -421,7 +421,7 @@ func New(
 
 	// The default value of optimisticExecution is enabled.
 	if !optimisticExecutionDisabled {
-		fmt.Println("Optimistic execution is enabled")
+		logger.Info("Optimistic execution is enabled")
 		baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 	}
 
