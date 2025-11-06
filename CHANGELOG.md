@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 
+* [#1907](https://github.com/crypto-org-chain/cronos/pull/1907) fix: Optimize staking endblocker with an in-memory KV store and standardize gas consumption for staking related messages
 *Nov 30, 2025*
 
 ## v1.5.4
