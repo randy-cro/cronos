@@ -25,8 +25,8 @@ require (
 	// release/v10.0.x
 	github.com/cosmos/ibc-go/v10 v10.5.0
 	github.com/cosmos/rosetta v0.50.12
-	github.com/crypto-org-chain/cronos-store/store v0.0.0-20251203075505-0670ff683f07
-	github.com/crypto-org-chain/cronos-store/versiondb v0.0.0-20251203075505-0670ff683f07
+	github.com/crypto-org-chain/cronos-store/store v0.0.0-20260513034712-e28fcd54f305
+	github.com/crypto-org-chain/cronos-store/versiondb v0.0.0-20260513034712-e28fcd54f305
 	github.com/ethereum/go-ethereum v1.15.11
 	github.com/evmos/ethermint v0.0.0-00010101000000-000000000000
 	github.com/golang/protobuf v1.5.4
